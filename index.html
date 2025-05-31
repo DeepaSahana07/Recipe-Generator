@@ -1,0 +1,326 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recipe Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Recipe Generator 🍽️</h1>
+        <p>Enter a dish name and ingredients to generate a recipe!</p>
+
+        <input type="text" id="recipe_name" placeholder="Enter recipe name (e.g., Pasta, Soup)">
+        <input type="text" id="ingredients" placeholder="Enter ingredients (comma-separated)">
+        
+        <label for="diet">Dietary Preference:</label>
+        <select id="diet">
+            <option value="any">Any</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="gluten-free">Gluten-Free</option>
+        </select>
+
+        <button onclick="generateRecipe()">Generate Recipe</button>
+        
+        <!-- Loading spinner -->
+        <div id="loading" class="loading-spinner" style="display: none;"></div>
+
+        <h2>Generated Recipe:</h2>
+        <div id="recipe"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recipe Generator - Your Culinary Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-utensils"></i>
+                <span>AI Recipe Maker</span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/" class="nav-link active">Home</a></li>
+                <li><a href="/browse" class="nav-link">Browse Recipes</a></li>
+                <li><a href="/favorites" class="nav-link">Favorites</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">AI-Powered Recipe Generator</h1>
+            <p class="hero-subtitle">Transform your ingredients into delicious recipes with the power of AI</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <h3>10,000+</h3>
+                    <p>Recipes Generated</p>
+                </div>
+                <div class="stat">
+                    <h3>50+</h3>
+                    <p>Cuisines</p>
+                </div>
+                <div class="stat">
+                    <h3>95%</h3>
+                    <p>Success Rate</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Generator Section -->
+    <section class="generator-section">
+        <div class="container">
+            <div class="generator-card">
+                <h2 class="section-title">Create Your Perfect Recipe</h2>
+                
+                <!-- Recipe Form -->
+                <form id="recipe-form" class="recipe-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="recipe_name">
+                                <i class="fas fa-utensils"></i>
+                                Recipe Name
+                            </label>
+                            <input type="text" id="recipe_name" placeholder="e.g., Creamy Pasta, Spicy Chicken">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="servings">
+                                <i class="fas fa-users"></i>
+                                Servings
+                            </label>
+                            <select id="servings">
+                                <option value="1">1 Person</option>
+                                <option value="2">2 People</option>
+                                <option value="4" selected>4 People</option>
+                                <option value="6">6 People</option>
+                                <option value="8">8+ People</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ingredients">
+                            <i class="fas fa-carrot"></i>
+                            Available Ingredients
+                        </label>
+                        <textarea id="ingredients" placeholder="chicken, rice, onion, garlic, tomatoes, cheese..."></textarea>
+                        <div class="input-hint">Separate ingredients with commas</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cuisine">
+                                <i class="fas fa-globe"></i>
+                                Cuisine Style
+                            </label>
+                            <select id="cuisine">
+                                <option value="">Any Style</option>
+                                <option value="italian">Italian</option>
+                                <option value="asian">Asian</option>
+                                <option value="mexican">Mexican</option>
+                                <option value="indian">Indian</option>
+                                <option value="american">American</option>
+                                <option value="mediterranean">Mediterranean</option>
+                                <option value="french">French</option>
+                                <option value="thai">Thai</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="diet">
+                                <i class="fas fa-leaf"></i>
+                                Dietary Requirements
+                            </label>
+                            <select id="diet">
+                                <option value="any">No Restrictions</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                                <option value="gluten-free">Gluten-Free</option>
+                                <option value="keto">Keto</option>
+                                <option value="paleo">Paleo</option>
+                                <option value="low-carb">Low Carb</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="difficulty">
+                                <i class="fas fa-chart-line"></i>
+                                Difficulty Level
+                            </label>
+                            <select id="difficulty">
+                                <option value="easy">Easy (30 min)</option>
+                                <option value="medium" selected>Medium (45 min)</option>
+                                <option value="hard">Advanced (60+ min)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="meal_type">
+                                <i class="fas fa-clock"></i>
+                                Meal Type
+                            </label>
+                            <select id="meal_type">
+                                <option value="">Any Time</option>
+                                <option value="breakfast">Breakfast</option>
+                                <option value="lunch">Lunch</option>
+                                <option value="dinner">Dinner</option>
+                                <option value="snack">Snack</option>
+                                <option value="dessert">Dessert</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="generate-btn">
+                        <i class="fas fa-magic"></i>
+                        Generate Recipe
+                    </button>
+                </form>
+
+                <!-- Loading Animation -->
+                <div id="loading" class="loading-container" style="display: none;">
+                    <div class="cooking-animation">
+                        <div class="pot">
+                            <div class="steam"></div>
+                            <div class="steam"></div>
+                            <div class="steam"></div>
+                        </div>
+                    </div>
+                    <p class="loading-text">Cooking up your perfect recipe...</p>
+                </div>
+
+                <!-- Recipe Display -->
+                <div id="recipe-result" class="recipe-result" style="display: none;">
+                    <div class="recipe-header">
+                        <h3 id="recipe-title"></h3>
+                        <div class="recipe-actions">
+                            <button class="action-btn favorite-btn" onclick="toggleFavorite()">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn share-btn" onclick="shareRecipe()">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <button class="action-btn print-btn" onclick="printRecipe()">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="recipe-time">45 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span id="recipe-servings">4 servings</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span id="recipe-difficulty">Medium</span>
+                        </div>
+                        <div class="meta-item rating">
+                            <i class="fas fa-star"></i>
+                            <span>Rate this recipe:</span>
+                            <div class="star-rating">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="recipe-content" class="recipe-content"></div>
+                    
+                    <div class="recipe-footer">
+                        <button class="secondary-btn" onclick="generateAnother()">
+                            <i class="fas fa-redo"></i>
+                            Generate Another
+                        </button>
+                        <button class="primary-btn" onclick="saveRecipe()">
+                            <i class="fas fa-save"></i>
+                            Save Recipe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="about">
+        <div class="container">
+            <h2 class="section-title">Why Choose Our AI Recipe Generator?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Intelligence</h3>
+                    <p>Advanced AI algorithms create personalized recipes based on your ingredients and preferences</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Global Cuisines</h3>
+                    <p>Explore recipes from around the world with authentic flavors and cooking techniques</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Dietary Flexibility</h3>
+                    <p>Support for all dietary requirements including vegan, keto, gluten-free, and more</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Quick & Easy</h3>
+                    <p>Generate professional-quality recipes in seconds, not hours of research</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Toast -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Recipe saved successfully!</span>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
